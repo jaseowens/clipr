@@ -48,6 +48,10 @@ const createNewCopyBlock = (data: string, prepend: boolean = false) => {
       createNewCopyBlock(copy);
     });
   } else {
+    const oldClipboardContent = document.getElementById("clipboard-content");
+    if (oldClipboardContent) {
+      oldClipboardContent.remove();
+    }
     const noContent = document.createElement("div");
     noContent.id = "no-content";
 
