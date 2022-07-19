@@ -53,7 +53,10 @@
                 {
                   "html": "./src/index.html",
                   "js": "./src/renderer.ts",
-                  "name": "main_window"
+                  "name": "main_window",
+                  "preload": {
+                    "js": "./src/preload.ts"
+                  }
                 }
               ]
             }
@@ -75,6 +78,8 @@
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.0.0",
     "electron": "19.0.8",
+    "electron-clipboard-extended": "^1.1.1",
+    "electron-store": "^8.0.2",
     "eslint": "^8.0.1",
     "eslint-plugin-import": "^2.25.0",
     "fork-ts-checker-webpack-plugin": "^7.2.1",
