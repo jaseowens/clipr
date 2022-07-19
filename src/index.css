@@ -1,0 +1,9 @@
+.wrapper {
+  background-color: red;
+  opacity: 0.95;
+  padding: 2rem;
+}
+
+.test {
+  background-color: white;
+}
