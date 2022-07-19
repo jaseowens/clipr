@@ -68,10 +68,16 @@ const createWindow = (): void => {
   mainWindow.on("ready-to-show", () => {
     const history: string[] = store.get("history") as string[];
     const deDup = new Set(history);
-    console.log("PREVIOUS DATA", history);
-    console.log("PREVIOUS DATA SETTIFIED", new Set(history));
+    store.set("history", deDup);
 
-    mainWindow.webContents.send("bootstrap", history);
+    store.onDidChange("history", (data) => {
+      console.log("STORE CHANGE ------", data);
+    });
+
+    console.log("PREVIOUS DATA", history);
+    // console.log("PREVIOUS DATA SETTIFIED", new Set(history));
+
+    // mainWindow.webContents.send("bootstrap", history);
   });
 
   // Open the DevTools.
