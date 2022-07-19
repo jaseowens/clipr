@@ -30,16 +30,33 @@ const createNewCopyBlock = (data: string, prepend: boolean = false) => {
 };
 
 (window as any).electronAPI.bootstrap((_: any, data: string[]) => {
-  const oldClipboardContent = document.getElementById("clipboard-content");
-  if (oldClipboardContent) {
-    oldClipboardContent.remove();
-  }
-  const clipboardContent = document.createElement("div");
-  clipboardContent.className = "wrapper";
-  clipboardContent.id = "clipboard-content";
+  if (data && Array.isArray(data) && data.length > 0) {
+    const noContent = document.getElementById("no-content");
+    if (noContent) {
+      noContent.remove();
+    }
+    const oldClipboardContent = document.getElementById("clipboard-content");
+    if (oldClipboardContent) {
+      oldClipboardContent.remove();
+    }
+    const clipboardContent = document.createElement("div");
+    clipboardContent.className = "wrapper";
+    clipboardContent.id = "clipboard-content";
 
-  document.body.append(clipboardContent);
-  data.forEach((copy) => {
-    createNewCopyBlock(copy);
-  });
+    document.body.append(clipboardContent);
+    data.forEach((copy) => {
+      createNewCopyBlock(copy);
+    });
+  } else {
+    const noContent = document.createElement("div");
+    noContent.id = "no-content";
+
+    const noContentText = document.createElement("div");
+    noContentText.innerText = "Start copying to see your history here!";
+    noContentText.id = "no-content-text";
+
+    noContent.append(noContentText);
+
+    document.body.append(noContent);
+  }
 });

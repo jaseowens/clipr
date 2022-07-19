@@ -24,14 +24,28 @@ let mainWindow: BrowserWindow;
 let tray: Tray;
 let store: Store;
 
+let rightPosition: number;
+
+// string[]
+const historyStore = "history";
+type UserPreferences = {
+  spacePosition?: "left" | "right";
+  darkMode?: boolean;
+};
+const userPreferencesStore = "userPreferences";
+
 const createWindow = (): void => {
   store = new Store();
+  const userPreferences = store.get(userPreferencesStore) as UserPreferences;
 
   // Create the browser window.
   const { size: screenSize } = screen.getDisplayNearestPoint(
     screen.getCursorScreenPoint()
   );
   const { width, height } = screenSize;
+
+  rightPosition = width - width / 5;
+
   mainWindow = new BrowserWindow({
     height: height,
     width: width / 5,
@@ -39,7 +53,7 @@ const createWindow = (): void => {
     frame: false,
     show: false,
     enableLargerThanScreen: true,
-    x: 0,
+    x: userPreferences.spacePosition === "left" ? 0 : rightPosition,
     y: 0,
     resizable: false,
     movable: false,
@@ -69,14 +83,8 @@ const createWindow = (): void => {
     deduplicateAndPushToStore(true);
 
     store.onDidChange("history", (data) => {
-      console.log("STORE CHANGE -----", data);
       mainWindow.webContents.send("bootstrap", data);
     });
-
-    // console.log("PREVIOUS DATA", history);
-    // console.log("PREVIOUS DATA SETTIFIED", new Set(history));
-
-    // mainWindow.webContents.send("bootstrap", history);
   });
 
   // Open the DevTools.
@@ -99,12 +107,59 @@ app.on("ready", () => {
 
   tray = new Tray(image.resize({ width: 16, height: 16 }));
 
+  const userPreferences = store.get(userPreferencesStore) as UserPreferences;
+
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "Open Space",
       type: "normal",
       click: () => {
-        createWindow();
+        mainWindow.show();
+      },
+    },
+    {
+      type: "separator",
+    },
+    {
+      label: "Space Position",
+      type: "submenu",
+      submenu: [
+        {
+          label: "Left",
+          type: "radio",
+          checked: userPreferences?.spacePosition === "left",
+          click: () => {
+            store.set("userPreferences.spacePosition", "left");
+            mainWindow.setPosition(0, 0);
+          },
+        },
+        {
+          label: "Right",
+          type: "radio",
+          checked: userPreferences?.spacePosition === "right",
+          click: () => {
+            store.set("userPreferences.spacePosition", "right");
+            mainWindow.setPosition(rightPosition, 0);
+          },
+        },
+      ],
+    },
+    {
+      label: "Dark Mode",
+      type: "checkbox",
+      checked: userPreferences?.darkMode === true,
+      click: () => {
+        store.set("userPreferences.spacePosition", !userPreferences.darkMode);
+      },
+    },
+    {
+      type: "separator",
+    },
+    {
+      label: "Clear History",
+      type: "normal",
+      click: () => {
+        store.set("history", []);
       },
     },
   ]);
