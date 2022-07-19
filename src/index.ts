@@ -21,7 +21,7 @@ declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 let mainWindow: BrowserWindow;
-
+let tray: Tray;
 let store: Store;
 
 const createWindow = (): void => {
@@ -66,15 +66,14 @@ const createWindow = (): void => {
   });
 
   mainWindow.on("ready-to-show", () => {
-    const history: string[] = store.get("history") as string[];
-    const deDup = new Set(history);
-    store.set("history", deDup);
+    deduplicateAndPushToStore(true);
 
     store.onDidChange("history", (data) => {
-      console.log("STORE CHANGE ------", data);
+      console.log("STORE CHANGE -----", data);
+      mainWindow.webContents.send("bootstrap", data);
     });
 
-    console.log("PREVIOUS DATA", history);
+    // console.log("PREVIOUS DATA", history);
     // console.log("PREVIOUS DATA SETTIFIED", new Set(history));
 
     // mainWindow.webContents.send("bootstrap", history);
@@ -83,8 +82,6 @@ const createWindow = (): void => {
   // Open the DevTools.
   mainWindow.webContents.openDevTools({ mode: "undocked" });
 };
-
-let tray: Tray;
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -116,23 +113,23 @@ app.on("ready", () => {
   tray.setContextMenu(contextMenu);
 
   globalShortcut.register("CommandOrControl+Shift+V", () => {
-    console.log("Special Paste");
     mainWindow.show();
   });
 
   clipboard
     .on("text-changed", () => {
       const currentText: string = clipboard.readText();
-      console.log("TEXT CHANGE?", currentText);
       // Send data to window
+      // mainWindow.webContents.send("text-copied", currentText);
 
-      mainWindow.webContents.send("text-copied", currentText);
-      const history: string[] = store.get("history") as string[];
-      store.set("history", [currentText, ...history]);
+      deduplicateAndPushToStore(false, currentText);
+      // const history: string[] = store.get("history") as string[];
+      // const newHistroy = [currentText, ...history];
+      // const deDup = new Set(newHistroy);
+      // store.set("history", Array.from(deDup));
     })
     .on("image-changed", () => {
       const currentImage = clipboard.readImage();
-      console.log("IMAGE CHANGE?", currentImage);
     })
     .startWatching();
 });
@@ -154,5 +151,24 @@ app.on("activate", () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+const deduplicateAndPushToStore = (
+  initial?: boolean,
+  additionalData?: string
+) => {
+  // store.clear();
+  const history: string[] = store.get("history") as string[];
+  let data: string[];
+
+  if (history && Array.isArray(history) && history.length > 0) {
+    data = additionalData ? [additionalData, ...history] : history;
+  } else {
+    data = [additionalData];
+  }
+
+  data = data.filter((n) => n);
+  data = Array.from(new Set(data));
+  store.set("history", data);
+  if (initial) {
+    mainWindow.webContents.send("bootstrap", data);
+  }
+};

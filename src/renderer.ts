@@ -1,14 +1,8 @@
 import "./index.css";
 
-console.log(
-  '👋 This message is being logged by "renderer.js", included via webpack'
-);
-
-const clipboardContent = document.getElementById("clipboard-content");
-
-// window.electronAPI.setTitle(title)
-
 const createNewCopyBlock = (data: string, prepend: boolean = false) => {
+  const clipboardContent = document.getElementById("clipboard-content");
+
   const box = document.createElement("div");
   box.className = "box";
 
@@ -36,13 +30,16 @@ const createNewCopyBlock = (data: string, prepend: boolean = false) => {
 };
 
 (window as any).electronAPI.bootstrap((_: any, data: string[]) => {
-  console.log("BOOTSTRAP!", data);
+  const oldClipboardContent = document.getElementById("clipboard-content");
+  if (oldClipboardContent) {
+    oldClipboardContent.remove();
+  }
+  const clipboardContent = document.createElement("div");
+  clipboardContent.className = "wrapper";
+  clipboardContent.id = "clipboard-content";
+
+  document.body.append(clipboardContent);
   data.forEach((copy) => {
     createNewCopyBlock(copy);
   });
-});
-
-(window as any).electronAPI.handleTextCopied((_: any, data: string) => {
-  console.log("COPY EVENT!", data);
-  createNewCopyBlock(data, true);
 });
