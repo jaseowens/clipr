@@ -1,3 +1,4 @@
+import { EVENTS } from "./types";
 import {
   app,
   BrowserWindow,
@@ -20,25 +21,34 @@ import Store from "electron-store";
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+type StoreType = {
+  history: string[];
+  userPreferences: {
+    spacePosition: "left" | "right";
+    theme: "light" | "dark";
+  };
+};
+
 let mainWindow: BrowserWindow;
 let mainWindowWidth: number;
 let screenWidth: number;
 let tray: Tray;
-let store: Store;
+let store: Store<StoreType>;
 
 let rightPosition: number;
 
-// string[]
-const historyStore = "history";
-type UserPreferences = {
-  spacePosition?: "left" | "right";
-  darkMode?: boolean;
-};
-const userPreferencesStore = "userPreferences";
-
 const createWindow = (): void => {
-  store = new Store();
-  const userPreferences = store.get(userPreferencesStore) as UserPreferences;
+  store = new Store<StoreType>({
+    defaults: {
+      history: [],
+      userPreferences: {
+        spacePosition: "left",
+        theme: "dark",
+      },
+    },
+  });
+  const userPreferences = store.get("userPreferences");
+  console.log("LOOKIE", userPreferences.theme);
 
   // Create the browser window.
   const { size: screenSize } = screen.getDisplayNearestPoint(
@@ -85,12 +95,12 @@ const createWindow = (): void => {
     hideMainWindow();
   });
 
-  ipcMain.on("handle-text-selected", (event, data) => {
+  ipcMain.on(EVENTS.HANDLE_TEXT_SELECTED, (event, data) => {
     clipboard.writeText(data);
     hideMainWindow();
   });
 
-  ipcMain.on("clear-data", (event, data) => {
+  ipcMain.on(EVENTS.CLEAR_DATA, () => {
     store.set("history", []);
   });
 
@@ -101,11 +111,7 @@ const createWindow = (): void => {
       mainWindow.webContents.send("bootstrap", data);
     });
 
-    store.onDidChange("userPreferences.spacePosition", (data) => {
-      const { spacePosition } = store.get(
-        userPreferencesStore
-      ) as UserPreferences;
-      console.log("HERE", mainWindow.isVisible());
+    store.onDidChange("userPreferences", ({ spacePosition }) => {
       mainWindow.isVisible()
         ? moveWindowOnScreen(spacePosition)
         : moveWindowOffScreen(spacePosition);
@@ -132,7 +138,7 @@ app.on("ready", () => {
 
   tray = new Tray(image.resize({ width: 16, height: 16 }));
 
-  const userPreferences = store.get(userPreferencesStore) as UserPreferences;
+  const userPreferences = store.get("userPreferences");
 
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -169,13 +175,31 @@ app.on("ready", () => {
         },
       ],
     },
+    // {
+    //   label: "Dark Mode",
+    //   type: "checkbox",
+    //   checked: userPreferences?.darkMode === true,
+    //   click: () => {
+    //     store.set("userPreferences.spacePosition", !userPreferences.darkMode);
+    //   },
+    // },
     {
-      label: "Dark Mode",
-      type: "checkbox",
-      checked: userPreferences?.darkMode === true,
-      click: () => {
-        store.set("userPreferences.spacePosition", !userPreferences.darkMode);
-      },
+      label: "Theme",
+      type: "submenu",
+      submenu: [
+        {
+          label: "Dark",
+          type: "radio",
+          checked: userPreferences?.theme === "light",
+          click: () => {},
+        },
+        {
+          label: "Light",
+          type: "radio",
+          checked: userPreferences?.theme === "dark",
+          click: () => {},
+        },
+      ],
     },
     {
       type: "separator",
@@ -251,13 +275,13 @@ const moveWindowOnScreen = (position: "left" | "right") => {
 };
 
 const showMainWindow = () => {
-  const { spacePosition } = store.get(userPreferencesStore) as UserPreferences;
+  const { spacePosition } = store.get("userPreferences");
   mainWindow.show();
   moveWindowOnScreen(spacePosition);
 };
 
 const hideMainWindow = () => {
-  const { spacePosition } = store.get(userPreferencesStore) as UserPreferences;
+  const { spacePosition } = store.get("userPreferences");
   moveWindowOffScreen(spacePosition);
   mainWindow.hide();
 };
