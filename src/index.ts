@@ -21,6 +21,8 @@ declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 let mainWindow: BrowserWindow;
+let mainWindowWidth: number;
+let screenWidth: number;
 let tray: Tray;
 let store: Store;
 
@@ -44,16 +46,21 @@ const createWindow = (): void => {
   );
   const { width, height } = screenSize;
 
-  rightPosition = width - width / 5;
+  screenWidth = width;
+  mainWindowWidth = width / 5;
+  rightPosition = width - mainWindowWidth;
 
   mainWindow = new BrowserWindow({
     height: height,
-    width: width / 5,
+    width: mainWindowWidth,
     alwaysOnTop: true,
     frame: false,
     show: false,
     enableLargerThanScreen: true,
-    x: userPreferences.spacePosition === "left" ? 0 : rightPosition,
+    x:
+      userPreferences.spacePosition === "left"
+        ? -mainWindowWidth
+        : screenWidth + mainWindowWidth,
     y: 0,
     resizable: false,
     movable: false,
@@ -71,12 +78,12 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   mainWindow.on("blur", () => {
-    mainWindow.hide();
+    hideMainWindow();
   });
 
   ipcMain.on("text-selected", (event, data) => {
     clipboard.writeText(data);
-    mainWindow.hide();
+    hideMainWindow();
   });
 
   mainWindow.on("ready-to-show", () => {
@@ -84,6 +91,16 @@ const createWindow = (): void => {
 
     store.onDidChange("history", (data) => {
       mainWindow.webContents.send("bootstrap", data);
+    });
+
+    store.onDidChange("userPreferences.spacePosition", (data) => {
+      const { spacePosition } = store.get(
+        userPreferencesStore
+      ) as UserPreferences;
+      console.log("HERE", mainWindow.isVisible());
+      mainWindow.isVisible()
+        ? moveWindowOnScreen(spacePosition)
+        : moveWindowOffScreen(spacePosition);
     });
   });
 
@@ -114,7 +131,7 @@ app.on("ready", () => {
       label: "Open Space",
       type: "normal",
       click: () => {
-        mainWindow.show();
+        showMainWindow();
       },
     },
     {
@@ -168,7 +185,7 @@ app.on("ready", () => {
   tray.setContextMenu(contextMenu);
 
   globalShortcut.register("CommandOrControl+Shift+V", () => {
-    mainWindow.show();
+    showMainWindow();
   });
 
   clipboard
@@ -205,6 +222,37 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+const moveWindowOffScreen = (position: "left" | "right") => {
+  if (position === "left") {
+    let xPos = -mainWindowWidth;
+    mainWindow.setPosition(xPos, 0, true);
+  } else {
+    let xPos = screenWidth + mainWindowWidth;
+    mainWindow.setPosition(xPos, 0, true);
+  }
+};
+
+const moveWindowOnScreen = (position: "left" | "right") => {
+  if (position === "left") {
+    let xPos = 0;
+    mainWindow.setPosition(xPos, 0, true);
+  } else {
+    mainWindow.setPosition(rightPosition, 0, true);
+  }
+};
+
+const showMainWindow = () => {
+  const { spacePosition } = store.get(userPreferencesStore) as UserPreferences;
+  mainWindow.show();
+  moveWindowOnScreen(spacePosition);
+};
+
+const hideMainWindow = () => {
+  const { spacePosition } = store.get(userPreferencesStore) as UserPreferences;
+  moveWindowOffScreen(spacePosition);
+  mainWindow.hide();
+};
 
 const deduplicateAndPushToStore = (
   initial?: boolean,

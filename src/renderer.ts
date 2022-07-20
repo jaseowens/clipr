@@ -5,7 +5,6 @@ const createNewCopyBlock = (data: string, prepend: boolean = false) => {
 
   const box = document.createElement("div");
   box.className = "box";
-
   box.addEventListener("click", () => {
     (window as any).electronAPI.handleTextSelected(data);
   });
@@ -14,7 +13,7 @@ const createNewCopyBlock = (data: string, prepend: boolean = false) => {
   copyIconWrapper.className = "copy-icon-wrapper";
 
   const copyIcon = document.createElement("img");
-  copyIcon.src = "./images/copy.svg";
+  copyIcon.src = "./images/copy-white.svg";
   copyIcon.alt = "copy icon";
   copyIcon.className = "copy-icon";
 
