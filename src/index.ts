@@ -43,12 +43,12 @@ const createWindow = (): void => {
       history: [],
       userPreferences: {
         spacePosition: "left",
-        theme: "dark",
+        theme: nativeTheme.shouldUseDarkColors ? "dark" : "light",
       },
     },
   });
   const userPreferences = store.get("userPreferences");
-  console.log("LOOKIE", userPreferences.theme);
+  nativeTheme.themeSource = userPreferences.theme;
 
   // Create the browser window.
   const { size: screenSize } = screen.getDisplayNearestPoint(
@@ -175,14 +175,6 @@ app.on("ready", () => {
         },
       ],
     },
-    // {
-    //   label: "Dark Mode",
-    //   type: "checkbox",
-    //   checked: userPreferences?.darkMode === true,
-    //   click: () => {
-    //     store.set("userPreferences.spacePosition", !userPreferences.darkMode);
-    //   },
-    // },
     {
       label: "Theme",
       type: "submenu",
@@ -190,14 +182,20 @@ app.on("ready", () => {
         {
           label: "Dark",
           type: "radio",
-          checked: userPreferences?.theme === "light",
-          click: () => {},
+          checked: userPreferences?.theme === "dark",
+          click: () => {
+            store.set("userPreferences.theme", "dark");
+            nativeTheme.themeSource = "dark";
+          },
         },
         {
           label: "Light",
           type: "radio",
-          checked: userPreferences?.theme === "dark",
-          click: () => {},
+          checked: userPreferences?.theme === "light",
+          click: () => {
+            store.set("userPreferences.theme", "light");
+            nativeTheme.themeSource = "light";
+          },
         },
       ],
     },
