@@ -79,6 +79,9 @@ const createWindow = (): void => {
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
+    icon: nativeImage.createFromPath(
+      path.join(__dirname, "./images/appicon.png")
+    ),
     // fullscreen-ui
     // hud
     // selection
@@ -119,7 +122,7 @@ const createWindow = (): void => {
   });
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools({ mode: "undocked" });
+  // mainWindow.webContents.openDevTools({ mode: "undocked" });
 };
 
 // This method will be called when Electron has finished
@@ -207,6 +210,13 @@ app.on("ready", () => {
       type: "normal",
       click: () => {
         store.set("history", []);
+      },
+    },
+    {
+      label: "Quit",
+      type: "normal",
+      click: () => {
+        app.quit();
       },
     },
   ]);
