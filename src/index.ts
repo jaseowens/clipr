@@ -69,7 +69,11 @@ const createWindow = (): void => {
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
-    vibrancy: "fullscreen-ui",
+    // fullscreen-ui
+    // hud
+    // selection
+
+    vibrancy: "hud",
     visualEffectState: "active",
   });
   mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
@@ -81,9 +85,13 @@ const createWindow = (): void => {
     hideMainWindow();
   });
 
-  ipcMain.on("text-selected", (event, data) => {
+  ipcMain.on("handle-text-selected", (event, data) => {
     clipboard.writeText(data);
     hideMainWindow();
+  });
+
+  ipcMain.on("clear-data", (event, data) => {
+    store.set("history", []);
   });
 
   mainWindow.on("ready-to-show", () => {

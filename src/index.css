@@ -1,16 +1,37 @@
 /* https://sarunw.com/posts/dark-color-cheat-sheet/ */
 
 :root {
-  --dark-bg: #1c1c1e;
-  --dark-bg-2: #2c2c2e;
-  --dark-label: #ebebf5;
-  --light-bg: #f2f2f7;
-  --light-label: #3c3c43;
-  --font-size: 20px;
+  --dark-bg: #212529;
+  --dark-bg-2: #495057;
+  --dark-label: #dee2e6;
+  --light-bg: #f8f9fa;
+  --light-bg-2: #dee2e6;
+  --light-label: #495057;
+  --font-size: 16px;
+  --border-radius: 0.5rem;
 }
 
 body {
   margin: 0.5rem 0.3rem 0.3rem 0.3rem;
+}
+
+#clear-button {
+  padding: 0.4rem 0.7rem;
+  font-size: var(--font-size);
+  position: fixed;
+  z-index: 999;
+  right: 0;
+  margin-top: 0.1rem;
+  margin-right: 1rem;
+  border-radius: var(--border-radius);
+  background-color: var(--light-bg-2);
+  opacity: 0.25;
+  border: none;
+}
+
+#clear-button:hover {
+  opacity: 1;
+  cursor: pointer;
 }
 
 #no-content {
@@ -23,7 +44,7 @@ body {
   text-align: center;
   padding: 1.5rem;
   margin: 0.5rem;
-  border-radius: 0.3rem;
+  border-radius: var(--border-radius);
   background-color: var(--dark-bg);
   width: 100%;
   color: var(--dark-label);
@@ -32,6 +53,7 @@ body {
 
 .box:first-child {
   border: 2px solid yellow;
+  margin-top: 2.5rem;
 }
 
 .wrapper {
@@ -46,17 +68,19 @@ body {
   display: flex;
   margin-top: 1rem;
   position: relative;
-  border-radius: 0.3rem;
+  border-radius: var(--border-radius);
+  border: 2px solid var(--dark-bg-2);
   display: flex;
   justify-content: center;
+  transition: all 0.2s;
 }
 
 .copy-icon-wrapper {
   position: absolute;
   bottom: 0;
   right: 0;
-  border-top-right-radius: 0.3rem;
-  border-top-left-radius: 0.3rem;
+  border-bottom-right-radius: var(--border-radius);
+  border-bottom-left-radius: var(--border-radius);
   padding: 0.5rem 0;
   visibility: hidden;
   width: 100%;
@@ -66,6 +90,12 @@ body {
 
 .box:hover {
   cursor: pointer;
+  border-color: var(--light-bg-2);
+  transform: scale(1.05);
+}
+
+.box:hover .data {
+  font-size: 20px;
 }
 
 .box:hover .copy-icon-wrapper {
@@ -82,9 +112,10 @@ body {
 
 .data {
   font-size: var(--font-size);
-  padding: 0.8rem;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin: 3rem 0.8rem 3rem 0.8rem;
+  overflow-x: hidden;
+  text-align: center;
+  transition: all 0.1s;
 }
 
 ::-webkit-scrollbar {

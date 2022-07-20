@@ -1,5 +1,10 @@
 import "./index.css";
 
+const clearButton = document.getElementById("clear-button");
+clearButton.addEventListener("click", () => {
+  (window as any).electronAPI.clearData(null);
+});
+
 const createNewCopyBlock = (data: string, prepend: boolean = false) => {
   const clipboardContent = document.getElementById("clipboard-content");
 

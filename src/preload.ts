@@ -7,5 +7,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   bootstrap: (callback: any) => {
     return ipcRenderer.on("bootstrap", callback);
   },
-  handleTextSelected: (title: any) => ipcRenderer.send("text-selected", title),
+  handleTextSelected: (title: any) =>
+    ipcRenderer.send("handle-text-selected", title),
+  clearData: (data: any) => ipcRenderer.send("clear-data", data),
 });
