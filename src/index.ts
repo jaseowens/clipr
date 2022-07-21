@@ -47,6 +47,7 @@ const createWindow = (): void => {
       },
     },
   });
+  store.delete("history");
   const userPreferences = store.get("userPreferences");
   nativeTheme.themeSource = userPreferences.theme;
 
@@ -239,9 +240,6 @@ app.on("ready", () => {
       // const newHistroy = [currentText, ...history];
       // const deDup = new Set(newHistroy);
       // store.set("history", Array.from(deDup));
-    })
-    .on("image-changed", () => {
-      const currentImage = clipboard.readImage();
     })
     .startWatching();
 });
