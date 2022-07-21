@@ -80,7 +80,7 @@ const createWindow = (): void => {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
     icon: nativeImage.createFromPath(
-      path.join(__dirname, "./images/appicon.png")
+      path.join(__dirname, "./images/appicon.icns")
     ),
     // fullscreen-ui
     // hud

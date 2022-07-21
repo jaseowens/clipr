@@ -19,7 +19,10 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "appId": "com.jaseowens.clipr",
+        "icon": "./src/images/appicon.icns"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
@@ -30,8 +33,7 @@
         {
           "name": "@electron-forge/maker-dmg",
           "config": {
-            "format": "ULFO",
-            "icon": "./src/images/appicon.png"
+            "format": "ULFO"
           }
         },
         {
