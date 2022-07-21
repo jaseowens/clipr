@@ -47,7 +47,6 @@ const createWindow = (): void => {
       },
     },
   });
-  store.delete("history");
   const userPreferences = store.get("userPreferences");
   nativeTheme.themeSource = userPreferences.theme;
 
