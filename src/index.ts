@@ -11,7 +11,10 @@ import {
   Tray,
 } from "electron";
 import * as path from "path";
-import * as clipboard from "electron-clipboard-extended";
+import {
+  ListeningClipboard,
+  ListeningClipboardEvents,
+} from "electron-clipboard-listener";
 
 import Store from "electron-store";
 
@@ -99,7 +102,7 @@ const createWindow = (): void => {
   });
 
   ipcMain.on(EVENTS.HANDLE_TEXT_SELECTED, (event, data) => {
-    clipboard.writeText(data);
+    ListeningClipboard.writeText(data);
     hideMainWindow();
   });
 
@@ -228,19 +231,10 @@ app.on("ready", () => {
     showMainWindow();
   });
 
-  clipboard
-    .on("text-changed", () => {
-      const currentText: string = clipboard.readText();
-      // Send data to window
-      // mainWindow.webContents.send("text-copied", currentText);
-
-      deduplicateAndPushToStore(false, currentText);
-      // const history: string[] = store.get("history") as string[];
-      // const newHistroy = [currentText, ...history];
-      // const deDup = new Set(newHistroy);
-      // store.set("history", Array.from(deDup));
-    })
-    .startWatching();
+  ListeningClipboard.startWatching(500);
+  ListeningClipboard.on(ListeningClipboardEvents.TEXT_UPDATED, (newText) => {
+    deduplicateAndPushToStore(false, newText);
+  });
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
