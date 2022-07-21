@@ -2,9 +2,12 @@
 
 Clipr is a super simple, free, MacOS clipboard manager.
 
-## Warning
+## Installation
 
-There is currently a breaking bug, copying more than one image causes the application to hang. Do not recommend using this until this is resolved.
+- Download the latest release from [releases](https://github.com/jaseowens/clipr/releases)
+- Open DMG
+- Drag to applications folder
+- If blocked by security: System Preferences > Security & Privacy > General > 'Clipr was blocked' > Open Anyway
 
 ## Usage
 
@@ -31,22 +34,6 @@ Picking Previous Copy
 ![Picking Previous Copy](https://i.imgur.com/S62gQDY.png)
 Light Mode
 ![Light Mode](https://i.imgur.com/veneNJG.png)
-
-## Installation
-
-Install dependencies
-
-```bash
-  yarn
-```
-
-Create package
-
-```bash
-  yarn make
-```
-
-A folder 'out' will be created. This folder will contain another folder 'make' that will contain a dmg to install.
 
 ## Local Development
 
